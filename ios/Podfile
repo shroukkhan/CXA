@@ -30,26 +30,11 @@ target 'OKKAMI3' do
 
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
 
-  pod 'RNDeviceInfo', :path => '../node_modules/react-native-deviceinfo'
 
   pod 'ReactNativePermissions', :path => '../node_modules/react-native-permissions'
 
   pod 'react-native-geolocation', :path => '../node_modules/@react-native-community/geolocation'
 
-  target 'OKKAMI3Tests' do
-    inherit! :search_paths
-    # Pods for testing
-  end
 
   use_native_modules!
-end
-
-target 'OKKAMI3-tvOS' do
-  # Pods for OKKAMI3-tvOS
-
-  target 'OKKAMI3-tvOSTests' do
-    inherit! :search_paths
-    # Pods for testing
-  end
-
 end

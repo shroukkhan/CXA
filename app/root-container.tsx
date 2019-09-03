@@ -6,6 +6,7 @@ import StartupActions from "./services/appstart/startup-redux"
 import ReduxPersist from "./config/redux-persist"
 import { Provider as PaperProvider } from "react-native-paper"
 import ApplicationThemes from "./theme/theme"
+import { SafeAreaView } from "react-navigation"
 
 class RootContainer extends Component<{
   startup: () => void
@@ -20,8 +21,10 @@ class RootContainer extends Component<{
   public render() {
     return (
       <PaperProvider theme={ApplicationThemes}>
-        <StatusBar barStyle="dark-content" />
-        <ReduxNavigation />
+        <StatusBar barStyle="dark-content"/>
+        <SafeAreaView style={ApplicationThemes.screen.mainContainer}>
+          <ReduxNavigation/>
+        </SafeAreaView>
       </PaperProvider>
     )
   }

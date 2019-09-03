@@ -10,8 +10,9 @@ const AppNavigation = createStackNavigator(
   },
   {
     initialRouteName: "MoviesScreen",
-    headerMode: "none",
+    headerMode:"none"
   },
 )
+
 
 export default createAppContainer(AppNavigation)

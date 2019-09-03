@@ -1,6 +1,31 @@
 {
-  "requestGpsPermission": null,
-  "gpsPermissionComplete": [
-    "gpsPermission"
+  "requestTopMovies": [
+    "topMoviesRequest"
+  ],
+  "topMoviesSuccess": [
+    "topMoviesResponse"
+  ],
+  "topMoviesFailure": [
+    "topMoviesError"
+  ],
+
+  "requestPopularMovies": [
+    "popularMoviesRequest"
+  ],
+  "popularMoviesSuccess": [
+    "popularMoviesResponse"
+  ],
+  "popularMoviesFailure": [
+    "popularMoviesError"
+  ],
+
+  "requestSearchMovies": [
+    "searchMoviesRequest"
+  ],
+  "searchMoviesSuccess": [
+    "searchMoviesResponse"
+  ],
+  "searchMoviesFailure": [
+    "searchMoviesError"
   ]
 }

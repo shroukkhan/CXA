@@ -8,7 +8,7 @@ import ReduxPersist from "../../config/redux-persist"
 export const reducers = combineReducers({
   startup: require("../appstart/startup-redux").reducer,
   nav: require("../navigation/redux-nagivation").reducer,
-  account: require("../../screens/account-screen/account-redux").reducer,
+  movies: require("../../features/movies-screen/movies-redux").reducer,
 })
 
 export default () => {

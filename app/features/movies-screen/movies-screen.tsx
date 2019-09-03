@@ -2,21 +2,19 @@ import * as React from "react"
 import { View } from "react-native"
 import { NavigationScreenProps } from "react-navigation"
 import styles from "./styles/login-options-screen-style"
-import { OkButton } from "../../components/ok-button"
 import { Card } from "react-native-paper"
-import AccountActions from "./account-redux"
 import { connect } from "react-redux"
 import { createSelector } from "reselect"
 
-export interface ILoginOptionsScreenProps extends NavigationScreenProps<{}> {
+export interface IMoviesScreenProps extends NavigationScreenProps<{}> {
   requestAccountLogin: () => void
 }
 
 
-class LoginOptionsScreen extends React.Component<ILoginOptionsScreenProps, {
+class MoviesScreen extends React.Component<IMoviesScreenProps, {
   fetching: boolean,
   error?: string,
-  data?:any
+  data?: any
 }> {
 
   public state = {
@@ -28,9 +26,7 @@ class LoginOptionsScreen extends React.Component<ILoginOptionsScreenProps, {
     return (
       <View style={styles.container}>
         <Card>
-          <OkButton label={"CONTINUE_WITH_FACEBOOK"} onPress={this.handleFacebookClick}/>
-          <OkButton label={"CONTINUE_WITH_LINE"} onPress={this.handleLineClick}/>
-          <OkButton label={"EMAIL_LOG_IN"} onPress={this.handleEmailClick}/>
+
         </Card>
       </View>
     )
@@ -70,14 +66,15 @@ const mapStateToProps = (state) => {
 }
 const mapDispatchToProps = (dispatch) => {
   return {
-    requestAccountLogin: () => dispatch(AccountActions.requestAccountLogin({
-      provider: "email",
-      email: "khan@fingi.com",
-      password: "2vergeten2",
-    })),
+    //   requestAccountLogin: () => dispatch(AccountActions.requestAccountLogin({
+    //     provider: "email",
+    //     email: "khan@fingi.com",
+    //     password: "2vergeten2",
+    //   })),
+    // }
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(LoginOptionsScreen)
+export default connect(mapStateToProps, mapDispatchToProps)(MoviesScreen)
 
 

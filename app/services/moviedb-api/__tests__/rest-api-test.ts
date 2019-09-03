@@ -30,7 +30,7 @@ describe("Test MovieDb REST API", () => {
 
   test("[Success] Should be able to search movies", async () => {
     mock.onGet(/search/).reply(200, require("./fixtures/searchMoviesResponse.json"))
-    const result = validateOrThrowApiResponse<ISearchResponse>(await API.searchMovies({
+    const result = validateOrThrowApiResponse<ISearchResponse>(await API.requestSearchMovies({
       query: "Harry Potter",
       page: 1,
     }))

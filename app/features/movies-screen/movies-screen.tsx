@@ -7,7 +7,7 @@ import { connect } from "react-redux"
 import { createSelector } from "reselect"
 
 export interface IMoviesScreenProps extends NavigationScreenProps<{}> {
-  requestAccountLogin: () => void
+  // requestMoviesLogin: () => void
 }
 
 
@@ -41,13 +41,12 @@ class MoviesScreen extends React.Component<IMoviesScreenProps, {
   }
 
   private handleEmailClick = () => {
-    // this.props.navigation.navigate("EmailLoginScreen")
-    this.props.requestAccountLogin()
+
   }
 }
 
-const fetchingFnc = (state) => state.account.accountLoginFetching
-const errorFnc = (state) => state.account.loginError
+const fetchingFnc = (state) => state.movies.moviesLoginFetching
+const errorFnc = (state) => state.movies.loginError
 
 
 const mapFnc = createSelector(
@@ -66,7 +65,7 @@ const mapStateToProps = (state) => {
 }
 const mapDispatchToProps = (dispatch) => {
   return {
-    //   requestAccountLogin: () => dispatch(AccountActions.requestAccountLogin({
+    //   requestMoviesLogin: () => dispatch(MoviesActions.requestMoviesLogin({
     //     provider: "email",
     //     email: "khan@fingi.com",
     //     password: "2vergeten2",

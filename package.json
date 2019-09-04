@@ -30,6 +30,7 @@
     "@react-native-community/geolocation": "^1.4.2",
     "apisauce": "0.16.0",
     "axios-mock-adapter": "^1.17.0",
+    "debounce": "^1.2.0",
     "enzyme": "^3.10.0",
     "enzyme-adapter-react-16": "^1.14.0",
     "i18n-js": "^3.0.11",

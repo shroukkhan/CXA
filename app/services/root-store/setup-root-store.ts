@@ -71,7 +71,11 @@ export default (rootReducer, rootSaga) => {
   }
 }
 
-export const getStore = () => _store
+export const getStore = () => {
+  if (_store) {
+    return _store
+  }
+}
 /**
  * Set a mock store used in unit testing
  * @param store

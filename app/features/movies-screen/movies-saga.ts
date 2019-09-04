@@ -4,7 +4,32 @@ import Actions, { MovieTypes } from "./movies-redux"
 import API from "../../services/moviedb-api/rest-api"
 import { validateOrThrowApiResponse } from "../../services/moviedb-api/response-validator"
 import ISearchParam from "../../services/moviedb-api/models/isearch-param"
-import { StartupTypes } from "../../services/appstart/startup-redux"
+import { SEARCH_STATE } from "../../components/search-header/search-header"
+
+
+export function* onNavigationParamChanged(action: {
+  key: string,
+  params: {
+    searchText?: string,
+    searchMode?: SEARCH_STATE
+  }
+}) {
+  const tag = "[onNavigationParamChanged]"
+  console.log(tag + " onNavigationParamChanged fired with : ", action.params)
+
+  if (action.params.searchText) {
+    yield put(Actions.requestSearchMovies({ page: 1, query: action.params.searchText }))
+  }
+  else if (action.params.searchMode) {
+    if (action.params.searchMode === SEARCH_STATE.TOP) {
+      yield put(Actions.requestTopMovies({ page: 1 }))
+    }
+    if (action.params.searchMode === SEARCH_STATE.POPULAR) {
+      yield put(Actions.requestPopularMovies({ page: 1 }))
+    }
+  }
+
+}
 
 
 export function* requestTopMovies(action: { topMoviesRequest: { page: number } }) {
@@ -80,7 +105,8 @@ export function* requestSearchMovies(action: { searchMoviesRequest: ISearchParam
 
 export default function* rootSaga() {
   yield all([
-    takeLatest(StartupTypes.STARTUP, requestTopMovies, { topMoviesRequest: {page:1} }), // we want to request movies during startup
+    // @ts-ignore
+    takeLatest("Navigation/SET_PARAMS", onNavigationParamChanged),
     takeLatest(MovieTypes.REQUEST_TOP_MOVIES, requestTopMovies),
     takeLatest(MovieTypes.REQUEST_POPULAR_MOVIES, requestPopularMovies),
     takeLatest(MovieTypes.REQUEST_SEARCH_MOVIES, requestSearchMovies),

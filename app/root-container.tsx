@@ -7,9 +7,11 @@ import ReduxPersist from "./config/redux-persist"
 import { Provider as PaperProvider } from "react-native-paper"
 import ApplicationThemes from "./theme/theme"
 import { SafeAreaView } from "react-navigation"
+import { createSelector } from "reselect"
 
 class RootContainer extends Component<{
-  startup: () => void
+  startup: () => void,
+  startupComplete: boolean
 }> {
   public componentDidMount() {
     // if redux persist is not active fire startup action
@@ -23,7 +25,7 @@ class RootContainer extends Component<{
       <PaperProvider theme={ApplicationThemes}>
         <StatusBar barStyle="dark-content"/>
         <SafeAreaView style={ApplicationThemes.screen.mainContainer}>
-          <ReduxNavigation/>
+          {this.props.startupComplete ? <ReduxNavigation/> : null}
         </SafeAreaView>
       </PaperProvider>
     )
@@ -35,7 +37,21 @@ const mapDispatchToProps = dispatch => ({
   startup: () => dispatch(StartupActions.startup()),
 })
 
+const startupCompleteFnc = (state) => !!state.startup.startupComplete
+const mapFnc = createSelector(
+  [
+    startupCompleteFnc,
+  ], (startupComplete) => {
+    return {
+      startupComplete,
+    }
+  })
+
+const mapStateToProps = (state) => {
+  return mapFnc(state)
+}
+
 export default connect(
-  null,
+  mapStateToProps,
   mapDispatchToProps,
 )(RootContainer)

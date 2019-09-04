@@ -9,14 +9,20 @@ import { Card, Paragraph } from "react-native-paper"
 import ISearchResponse, { ISearchResult } from "../../services/moviedb-api/models/isearch-response"
 import Activity from "../../components/activity/activity"
 import AppConfig from "../../config/app-config"
+import MoviesActions from "./movies-redux"
+import ISearchParam from "../../services/moviedb-api/models/isearch-param"
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList)
 
-export interface IMoviesScreenProps extends NavigationScreenProps<{
-  searchText?: string,
-  searchMode?: string
-}> {
-  collapsible: { paddingHeight: number, animatedY: number, onScroll: () => void },
+
+export interface INavigationProps {
+  onSearch: (text: string) => void
+  searchMode: SEARCH_STATE
+  onTabChange: (tabId: SEARCH_STATE) => void
+}
+
+export interface IMoviesScreenProps extends NavigationScreenProps<INavigationProps> {
+  collapsible: { paddingHeight: number, animatedY: number, onScroll: () => void }, // this is injected by withCollapsible HOC
   fetching: boolean,
   error?: string,
   data?: ISearchResult[]
@@ -29,30 +35,46 @@ export interface IMoviesScreenState {
 
 class MoviesScreen extends React.Component<IMoviesScreenProps, IMoviesScreenState> {
 
+  constructor(props: IMoviesScreenProps) {
+    super(props)
+  }
+
+  /**
+   * since we are using navigaiton props, i dont want the screen and list items to update
+   * @param nextProps
+   * @param nextState
+   */
+  public shouldComponentUpdate(nextProps, nextState) {
+    if (nextProps.fetching !== this.props.fetching ||
+      nextProps.error !== this.props.error ||
+      nextProps.data !== this.props.data
+    ) {
+      return true
+    }
+    return false
+  }
 
 
-  public renderItem = ({ item }) => (
-    <Card>
-      <Card.Title title={item.title} subtitle={"Rating : " + item.vote_average} />
+  public renderItem = ({ item }) => {
+    console.log("Rendering list item: ")
+    return <Card>
+      <Card.Title title={item.title} subtitle={"Rating : " + item.vote_average}/>
       <Card.Cover source={{ uri: AppConfig.imagePrefix + item.backdrop_path }}/>
       <Card.Content>
         <Paragraph>{item.overview}</Paragraph>
       </Card.Content>
     </Card>
-  )
+  }
 
   public render() {
     const { paddingHeight, animatedY, onScroll } = this.props.collapsible
-    const { searchText } = this.props.navigation.state.params ? this.props.navigation.state.params : { searchText: null }
-    const { searchMode } = this.props.navigation.state.params ? this.props.navigation.state.params : { searchMode: SEARCH_STATE.TOP }
-
     return (
       <>
         <AnimatedFlatList
           style={{ flex: 1 }}
           data={this.props.data}
           renderItem={this.renderItem}
-          keyExtractor={(item, index) => String(index)}
+          keyExtractor={(item, index) => String(item.id)}
           contentContainerStyle={{ paddingTop: paddingHeight }}
           scrollIndicatorInsets={{ top: paddingHeight }}
           onScroll={onScroll}
@@ -103,14 +125,17 @@ const mapStateToProps = (state, props) => {
 }
 const mapDispatchToProps = (dispatch) => {
   return {
-    //   requestMoviesLogin: () => dispatch(MoviesActions.requestMoviesLogin({
-    //     provider: "email",
-    //     email: "khan@fingi.com",
-    //     password: "2vergeten2",
-    //   })),
-    // }
+    requestTopMovies: (topMoviesRequest: { page: number }) => dispatch(MoviesActions.requestTopMovies(topMoviesRequest)),
+    requestPopularMovies: (popularMoviesRequest: { page: number }) => dispatch(MoviesActions.requestPopularMovies(popularMoviesRequest)),
+    requestSearchMovies: (searchMoviesRequest: ISearchParam) => dispatch(MoviesActions.requestSearchMovies(searchMoviesRequest)),
+
   }
+
 }
+
+const moviesScreen = connect(mapStateToProps, mapDispatchToProps)(MoviesScreen)
+
+console.log(moviesScreen)
 
 const collapsibleParams = {
   collapsibleComponent: SearchHeader,
@@ -120,9 +145,9 @@ const collapsibleParams = {
   },
 }
 
-const collapsibleMoviesScreen = withCollapsible(MoviesScreen, collapsibleParams)
+export default withCollapsible(moviesScreen, collapsibleParams)
 
-export default connect(mapStateToProps, mapDispatchToProps)(collapsibleMoviesScreen)
+
 
 
 

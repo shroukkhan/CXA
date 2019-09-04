@@ -2,12 +2,13 @@ import React from "react"
 import { TouchableOpacity, View } from "react-native"
 import EStyleSheet from "react-native-extended-stylesheet"
 import { Text, TextInput } from "react-native-paper"
-import { color } from "../../theme/index"
+import { color } from "../../theme"
+import debounce from "debounce"
 
-export const SEARCH_STATE = {
-  TOP: "Top Movies",
-  POPULAR: "Popular Movies",
-  SEARCH: "Search",
+export enum SEARCH_STATE {
+  TOP = "Top Movies",
+  POPULAR = "Popular Movies",
+  SEARCH = "Search",
 }
 
 
@@ -23,11 +24,9 @@ const TabBarButton = ({ text, selected, type, navigation }) => {
   )
 }
 
-const SearchHeader = ({ navigation, collapsible }) => {
+const SearchHeader = ({ navigation }) => {
   // @ts-ignore
-  const { searchText } = navigation.state.params ? navigation.state.params : {}
-  // @ts-ignore
-  const  searchMode  = navigation.state.params && navigation.state.params.searchMode ? navigation.state.params.searchMode : SEARCH_STATE.TOP
+  const searchMode = navigation.state.params && navigation.state.params.searchMode ? navigation.state.params.searchMode : SEARCH_STATE.TOP
 
 
   return (
@@ -37,8 +36,8 @@ const SearchHeader = ({ navigation, collapsible }) => {
         <TextInput
           style={styles.textInputStyle}
           label="Search Movies"
-          value={searchText}
-          onChangeText={text => navigation.setParams({ searchText: text })}
+          onFocus={() => navigation.setParams({ searchMode: SEARCH_STATE.SEARCH })}
+          onChangeText={text => debounce(navigation.setParams({ searchText: text }), 250)}
         />
         <View style={styles.buttonContainer}>
           {Object.keys(SEARCH_STATE).map((key) => <TabBarButton navigation={navigation} type={SEARCH_STATE[key]}

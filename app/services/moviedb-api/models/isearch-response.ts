@@ -1,4 +1,4 @@
-export interface Result {
+export interface ISearchResult {
   popularity: number;
   vote_count: number;
   video: boolean;
@@ -19,7 +19,7 @@ export default interface ISearchResponse {
   page: number;
   total_results: number;
   total_pages: number;
-  results: Result[];
+  results: ISearchResult[];
 }
 
 

@@ -2,7 +2,13 @@ import React from "react"
 import { TouchableOpacity, View } from "react-native"
 import EStyleSheet from "react-native-extended-stylesheet"
 import { Text, TextInput } from "react-native-paper"
-import { color } from "../theme"
+import { color } from "../../theme/index"
+
+export const SEARCH_STATE = {
+  TOP: "Top Movies",
+  POPULAR: "Popular Movies",
+  SEARCH: "Search",
+}
 
 
 const TabBarButton = ({ text, selected, type, navigation }) => {
@@ -21,7 +27,9 @@ const SearchHeader = ({ navigation, collapsible }) => {
   // @ts-ignore
   const { searchText } = navigation.state.params ? navigation.state.params : {}
   // @ts-ignore
-  const { searchMode } = navigation.state.params ? navigation.state.params : {}
+  const  searchMode  = navigation.state.params && navigation.state.params.searchMode ? navigation.state.params.searchMode : SEARCH_STATE.TOP
+
+
   return (
     <View
       style={styles.container}>
@@ -33,12 +41,10 @@ const SearchHeader = ({ navigation, collapsible }) => {
           onChangeText={text => navigation.setParams({ searchText: text })}
         />
         <View style={styles.buttonContainer}>
-          <TabBarButton navigation={navigation} type={"top"} key={"top"} selected={searchMode === "top"}
-                        text={"Top Movies"}/>
-          <TabBarButton navigation={navigation} type={"popular"} key={"popular"} selected={searchMode === "popular"}
-                        text={"Popular Movies"}/>
-          <TabBarButton navigation={navigation} type={"search"} key={"search"} selected={searchMode === "search"}
-                        text={"Search"}/>
+          {Object.keys(SEARCH_STATE).map((key) => <TabBarButton navigation={navigation} type={SEARCH_STATE[key]}
+                                                                key={SEARCH_STATE[key]}
+                                                                selected={searchMode === SEARCH_STATE[key]}
+                                                                text={SEARCH_STATE[key]}/>)}
         </View>
       </View>
     </View>
@@ -53,14 +59,6 @@ const styles = EStyleSheet.create({
     backgroundColor: color.background,
     borderBottomWidth: 0.75,
     borderBottomColor: color.charcoal,
-  },
-  internalContainer: {
-    // backgroundColor:color.background,
-    // shadowOffset: { width: 0, height: 2 },
-    // shadowColor: "black",
-    // shadowOpacity: 0.5,
-    // height:100
-
   },
   buttonContainer: {
     backgroundColor: color.background,
@@ -79,7 +77,6 @@ const styles = EStyleSheet.create({
     borderRadius: 5,
     justifyContent: "center",
     alignItems: "center",
-    // padding: 15,
     height: 35,
     marginRight: 5,
   },

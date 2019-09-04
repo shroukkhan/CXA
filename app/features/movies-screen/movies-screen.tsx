@@ -3,91 +3,103 @@ import { NavigationScreenProps } from "react-navigation"
 import { connect } from "react-redux"
 import { createSelector } from "reselect"
 import { withCollapsible } from "react-navigation-collapsible"
-import { Animated, FlatList, Text, TouchableOpacity } from "react-native"
-import SearchHeader from "../../components/search-header"
+import { Animated, FlatList } from "react-native"
+import SearchHeader, { SEARCH_STATE } from "../../components/search-header/search-header"
+import { Card, Paragraph } from "react-native-paper"
+import ISearchResponse, { ISearchResult } from "../../services/moviedb-api/models/isearch-response"
+import Activity from "../../components/activity/activity"
+import AppConfig from "../../config/app-config"
 
 const AnimatedFlatList = Animated.createAnimatedComponent(FlatList)
 
 export interface IMoviesScreenProps extends NavigationScreenProps<{
-  searchText?: string
+  searchText?: string,
+  searchMode?: string
 }> {
-  collapsible: { paddingHeight: number, animatedY: number, onScroll: () => void }
-}
-
-const data = []
-for (let i = 0; i < 60; i++) {
-  data.push(i.toString())
-}
-
-class MoviesScreen extends React.Component<IMoviesScreenProps, {
+  collapsible: { paddingHeight: number, animatedY: number, onScroll: () => void },
   fetching: boolean,
   error?: string,
-  data?: any
-}> {
+  data?: ISearchResult[]
+}
 
-  public state = {
-    fetching: false,
-    error: null,
-    data,
-  }
+// tslint:disable-next-line
+export interface IMoviesScreenState {
+
+}
+
+class MoviesScreen extends React.Component<IMoviesScreenProps, IMoviesScreenState> {
+
 
 
   public renderItem = ({ item }) => (
-    <TouchableOpacity
-      onPress={() => {
-        this.props.navigation.navigate("DetailScreen")
-      }}
-      style={{
-        width: "100%",
-        height: 50,
-        borderBottomColor: "#0002",
-        borderBottomWidth: 0.5,
-        paddingHorizontal: 20,
-        justifyContent: "center",
-      }}>
-      <Text style={{ fontSize: 22 }}>{item}</Text>
-    </TouchableOpacity>
+    <Card>
+      <Card.Title title={item.title} subtitle={"Rating : " + item.vote_average} />
+      <Card.Cover source={{ uri: AppConfig.imagePrefix + item.backdrop_path }}/>
+      <Card.Content>
+        <Paragraph>{item.overview}</Paragraph>
+      </Card.Content>
+    </Card>
   )
 
   public render() {
     const { paddingHeight, animatedY, onScroll } = this.props.collapsible
     const { searchText } = this.props.navigation.state.params ? this.props.navigation.state.params : { searchText: null }
-    const data = searchText
-      ? this.state.data.filter(item => item.includes(searchText))
-      : this.state.data
+    const { searchMode } = this.props.navigation.state.params ? this.props.navigation.state.params : { searchMode: SEARCH_STATE.TOP }
 
     return (
-      <AnimatedFlatList
-        style={{ flex: 1 }}
-        data={data}
-        renderItem={this.renderItem}
-        keyExtractor={(item, index) => String(index)}
-        contentContainerStyle={{ paddingTop: paddingHeight }}
-        scrollIndicatorInsets={{ top: paddingHeight }}
-        onScroll={onScroll}
-        _mustAddThis={animatedY}
-      />
+      <>
+        <AnimatedFlatList
+          style={{ flex: 1 }}
+          data={this.props.data}
+          renderItem={this.renderItem}
+          keyExtractor={(item, index) => String(index)}
+          contentContainerStyle={{ paddingTop: paddingHeight }}
+          scrollIndicatorInsets={{ top: paddingHeight }}
+          onScroll={onScroll}
+          _mustAddThis={animatedY}
+        />
+        <Activity show={this.props.fetching}/>
+      </>
     )
   }
 }
 
-const fetchingFnc = (state) => state.movies.moviesLoginFetching
-const errorFnc = (state) => state.movies.loginError
+// do memoization , so that it stays same for overlapping values
+const fetchingFnc = (state) => state.movies.topMoviesFetching || state.movies.topMoviesFetching || state.movies.popularMoviesFetching
+const errorFnc = (state) => state.movies.topMoviesError || state.movies.topMoviesError || state.movies.popularMoviesError
+
+const dataFnc = (state, props) => {
+  const currentState = (props.navigation.state.params && props.navigation.state.params.searchMode) || SEARCH_STATE.TOP
+  let data: ISearchResponse
+  if (currentState === SEARCH_STATE.TOP) {
+    data = state.movies.topMoviesResponse
+  }
+  else if (currentState === SEARCH_STATE.POPULAR) {
+    data = state.movies.popularMoviesResponse
+  }
+  else if (currentState === SEARCH_STATE.SEARCH) {
+    data = state.movies.searchMoviesResponse
+  }
+
+  return (data && data.results) || []
+}
 
 
 const mapFnc = createSelector(
   [
     fetchingFnc,
     errorFnc,
-  ], (fetching, error) => {
+    dataFnc,
+  ], (fetching, error, data) => {
     return {
       fetching,
       error,
+      data,
     }
   })
 
-const mapStateToProps = (state) => {
-  return mapFnc(state)
+const mapStateToProps = (state, props) => {
+  return mapFnc(state, props)
 }
 const mapDispatchToProps = (dispatch) => {
   return {
@@ -103,7 +115,7 @@ const mapDispatchToProps = (dispatch) => {
 const collapsibleParams = {
   collapsibleComponent: SearchHeader,
   collapsibleBackgroundStyle: {
-    height: 60,
+    height: 120,
     // disableFadeoutInnerComponent: true,
   },
 }

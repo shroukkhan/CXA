@@ -4,6 +4,7 @@ import Actions, { MovieTypes } from "./movies-redux"
 import API from "../../services/moviedb-api/rest-api"
 import { validateOrThrowApiResponse } from "../../services/moviedb-api/response-validator"
 import ISearchParam from "../../services/moviedb-api/models/isearch-param"
+import { StartupTypes } from "../../services/appstart/startup-redux"
 
 
 export function* requestTopMovies(action: { topMoviesRequest: { page: number } }) {
@@ -79,6 +80,7 @@ export function* requestSearchMovies(action: { searchMoviesRequest: ISearchParam
 
 export default function* rootSaga() {
   yield all([
+    takeLatest(StartupTypes.STARTUP, requestTopMovies, { topMoviesRequest: {page:1} }), // we want to request movies during startup
     takeLatest(MovieTypes.REQUEST_TOP_MOVIES, requestTopMovies),
     takeLatest(MovieTypes.REQUEST_POPULAR_MOVIES, requestPopularMovies),
     takeLatest(MovieTypes.REQUEST_SEARCH_MOVIES, requestSearchMovies),
